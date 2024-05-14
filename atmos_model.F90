@@ -63,7 +63,7 @@ use mpp_mod,           only : mpp_npes, mpp_pe, mpp_error, FATAL, mpp_chksum
 use mpp_mod,           only : input_nml_file
 
 use mpp_domains_mod,   only : domain2d
-use mpp_domains_mod,   only : mpp_define_layout, mpp_define_domains
+use mpp_domains_mod,   only : mpp_define_layout, mpp_define_domains, mpp_define_io_domain
 use mpp_domains_mod,   only : CYCLIC_GLOBAL_DOMAIN, mpp_get_data_domain
 use mpp_domains_mod,   only : mpp_get_compute_domain, mpp_get_tile_id
 use mpp_domains_mod,   only : mpp_get_current_ntile
@@ -426,6 +426,7 @@ else
    call define_cube_mosaic('ATM', Atmos%domain, layout, halo=1)
 endif
 
+call mpp_define_io_domain(Atmos%domain, (/1,1/))
 call mpp_get_compute_domain(Atmos%domain,is,ie,js,je)
 
 allocate ( glon_bnd(nlon+1,nlat+1))
