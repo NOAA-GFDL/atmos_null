@@ -169,6 +169,8 @@ type land_ice_atmos_boundary_type
    ! variables of this type are declared by coupler_main, allocated by flux_exchange_init.
 !quantities going from land+ice to atmos
    real, dimension(:,:),   pointer :: t              =>NULL() ! surface temperature for radiation calculations
+   real, dimension(:,:),   pointer :: t_ocean        =>null() ! ocean surface temperature for shield physics coming
+                                                              ! from Ice%t_surf through xgrid !joseph
    real, dimension(:,:),   pointer :: t_ref          =>null() ! surface air temperature (cjg: PBL depth mods)
    real, dimension(:,:),   pointer :: q_ref          =>null() ! surface air specific humidity (cjg: PBL depth mods)
    real, dimension(:,:),   pointer :: u_ref          =>null() ! surface air speed zonal
@@ -194,6 +196,7 @@ type land_ice_atmos_boundary_type
    real, dimension(:,:),   pointer :: thv_atm        =>null() ! surface air theta_v
    real, dimension(:,:),   pointer :: thv_surf       =>null() ! surface theta_v
    real, dimension(:,:),   pointer :: rough_mom      =>NULL() ! surface roughness (used for momentum)
+   real, dimension(:,:),   pointer :: rough_heat     =>null() ! surface roughness (used for heat) ! kgao
    real, dimension(:,:,:), pointer :: data =>NULL() !collective field for "named" fields above
    real, dimension(:,:),   pointer :: frac_open_sea  =>null() ! non-seaice fraction (%)
    integer :: xtype             !REGRID, REDIST or DIRECT
