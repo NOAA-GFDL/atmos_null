@@ -197,7 +197,6 @@ type land_ice_atmos_boundary_type
    real, dimension(:,:),   pointer :: thv_surf       =>null() ! surface theta_v
    real, dimension(:,:),   pointer :: rough_mom      =>NULL() ! surface roughness (used for momentum)
    real, dimension(:,:),   pointer :: rough_heat     =>NULL() ! surface roughness (used for heat)
-   real, dimension(:,:),   pointer :: t_ocean        =>NULL() ! surface ocean temp
    real, dimension(:,:,:), pointer :: data =>NULL() !collective field for "named" fields above
    real, dimension(:,:),   pointer :: frac_open_sea  =>null() ! non-seaice fraction (%)
    integer :: xtype             !REGRID, REDIST or DIRECT
