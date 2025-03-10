@@ -143,6 +143,8 @@ end type surf_diff_type
      real, pointer, dimension(:,:) :: flux_sw_vis            =>NULL()
      real, pointer, dimension(:,:) :: flux_sw_vis_dir        =>NULL()
      real, pointer, dimension(:,:) :: flux_sw_vis_dif        =>NULL()
+     real, pointer, dimension(:,:,:) :: gex_atm2lnd          =>null()
+     real, pointer, dimension(:,:,:) :: gex_lnd2atm          =>null()
      real, pointer, dimension(:,:) :: flux_lw  => NULL() ! net longwave flux (W/m2) at the surface
      real, pointer, dimension(:,:) :: lprec    => NULL() ! mass of liquid precipitation since last time step (Kg/m2)
      real, pointer, dimension(:,:) :: fprec    => NULL() ! ass of frozen precipitation since last time step (Kg/m2)
@@ -198,6 +200,7 @@ type land_ice_atmos_boundary_type
    real, dimension(:,:),   pointer :: rough_mom      =>NULL() ! surface roughness (used for momentum)
    real, dimension(:,:),   pointer :: rough_heat     =>NULL() ! surface roughness (used for heat)
    real, dimension(:,:,:), pointer :: data =>NULL() !collective field for "named" fields above
+   real, dimension(:,:,:), pointer :: gex_lnd2atm =>null() ! gex fields exchanged from lnd to atm
    real, dimension(:,:),   pointer :: frac_open_sea  =>null() ! non-seaice fraction (%)
    integer :: xtype             !REGRID, REDIST or DIRECT
 end type land_ice_atmos_boundary_type
