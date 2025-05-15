@@ -225,11 +225,12 @@ character(len=128) :: version = '$Id$'
 character(len=128) :: tagname = '$Name$'
 
 !---- atmos_model_nml
-integer :: layout(2)
+integer :: layout(2)=(/0,0/)
+integer :: io_layout(2)=(/0,0/)
 ! mask_table contains information for masking domain ( n_mask, layout and mask_list).
 character(len=128) :: mask_table = "INPUT/atmos_mask_table"
 
-namelist /atmos_model_nml/ layout, mask_table
+namelist /atmos_model_nml/ layout, io_layout, mask_table
 
 
 contains
@@ -432,13 +433,9 @@ else
    call define_cube_mosaic('ATM', Atmos%domain, layout, halo=1)
 endif
 
-call mpp_define_io_domain(Atmos%domain, (/1,1/))
+call mpp_define_io_domain(Atmos%domain, io_layout)
 call mpp_get_compute_domain(Atmos%domain,is,ie,js,je)
 
-allocate ( glon_bnd(nlon+1,nlat+1))
-allocate ( glat_bnd(nlon+1,nlat+1))
-allocate ( glon(nlon, nlat))
-allocate ( glat(nlon, nlat))
 allocate ( Atmos%lon_bnd(ie-is+2,je-js+2) )
 allocate ( Atmos%lat_bnd(ie-is+2,je-js+2) )
 allocate ( area(ie-is+1,je-js+1) )
@@ -448,11 +445,25 @@ tile_ids = mpp_get_tile_id(Atmos%domain)
 tile = tile_ids(1)
 deallocate(tile_ids)
 
-call get_grid_cell_vertices('ATM',tile,glon_bnd,glat_bnd)
-call get_grid_cell_centers ('ATM',tile,glon, glat)
+!allocate ( glon_bnd(nlon+1,nlat+1)); glon_bnd=0.0
+!allocate ( glat_bnd(nlon+1,nlat+1)); glat_bnd=0.0
+!These calls cause all cores to read the grid file leading to I/O race condition
+!call get_grid_cell_vertices('ATM',tile,glon_bnd,glat_bnd)
+!call get_grid_cell_centers ('ATM',tile,glon, glat)
+!Atmos % lon_bnd(:,:) = glon_bnd(is:ie+1, js:je+1)*atan(1.0)/45.0
+!Atmos % lat_bnd(:,:) = glat_bnd(is:ie+1, js:je+1)*atan(1.0)/45.0
+!
+!Instead we should pass Atmos%domain to avoid the I/O race condition
+!
+call get_grid_cell_vertices('ATM',tile,Atmos%lon_bnd, Atmos%lat_bnd, Atmos%domain)
+Atmos%lon_bnd(:,:) = Atmos%lon_bnd(:,:)*atan(1.0)/45.0
+Atmos%lat_bnd(:,:) = Atmos%lat_bnd(:,:)*atan(1.0)/45.0
 
-Atmos % lon_bnd(:,:) = glon_bnd(is:ie+1, js:je+1)*atan(1.0)/45.0
-Atmos % lat_bnd(:,:) = glat_bnd(is:ie+1, js:je+1)*atan(1.0)/45.0
+!Do we really need this code block? What uses diag_axis for atmos_null?
+!!begin block
+allocate ( glon(ie-is+1,je-js+1)); glon=0.0
+allocate ( glat(ie-is+1,je-js+1)); glat=0.0
+call get_grid_cell_centers ('ATM',tile,glon, glat, Atmos%domain)
 
 if(ntile==1) then
    Atmos%axes(1) = diag_axis_init('lon',glon(:,1),'degrees_E','X', long_name='longitude',&
@@ -467,6 +478,7 @@ else
    Atmos%axes(2) = diag_axis_init('lat',(/(real(i),i=1,nlat)/),'degrees_N','Y',long_name='latitude',&
         set_name='atmos',domain2 = Atmos%domain)  
 endif
+!!end block
 
 call register_tracers(MODEL_LAND, ntracers, ntprog, ndiag)
 allocate ( Atmos % t_bot(is:ie,js:je) )
