@@ -80,7 +80,7 @@ use grid2_mod,         only : get_grid_size, get_grid_cell_vertices
 use grid2_mod,         only : get_grid_cell_centers
 use diag_integral_mod, only : diag_integral_init
 use tracer_manager_mod,only : register_tracers
-use field_manager_mod, only : MODEL_LAND
+use field_manager_mod, only : MODEL_ATMOS
 
 implicit none
 private
@@ -480,7 +480,7 @@ else
 endif
 !!end block
 
-call register_tracers(MODEL_LAND, ntracers, ntprog, ndiag)
+call register_tracers(MODEL_ATMOS, ntracers, ntprog, ndiag)
 allocate ( Atmos % t_bot(is:ie,js:je) )
 allocate ( Atmos % tr_bot(is:ie,js:je,ntprog) )
 allocate ( Atmos % z_bot(is:ie,js:je) )
